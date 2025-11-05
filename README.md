@@ -202,8 +202,24 @@ docker compose up -d
 docker logs -f deepseek-ocr-webui
 
 # 4. Access Web UI
-# http://localhost:8001
+# The service listens on all network interfaces (0.0.0.0:8001)
+# Choose the appropriate access method:
+#
+# - Local access: http://localhost:8001
+# - LAN access: http://<server-ip>:8001
+# - Domain access: http://<your-domain>:8001 (if configured)
+#
+# Example: If your server IP is 192.168.1.100, use:
+# http://192.168.1.100:8001
 ```
+
+**Access Methods**:
+- **Local Machine**: `http://localhost:8001`
+- **Remote Server (No Domain)**: `http://<服务器IP地址>:8001`
+  - Find your IP: `hostname -I` or `ip addr show`
+  - Example: If IP is `192.168.1.100`, access `http://192.168.1.100:8001`
+- **With Domain**: `http://<your-domain>:8001` or `https://<your-domain>`
+  - Configure your reverse proxy (nginx/caddy) to forward to `localhost:8001`
 
 ---
 
@@ -254,7 +270,12 @@ python web_service_unified.py
 
 #### Step 3: Access Web UI
 
-Open browser and visit: `http://localhost:8001`
+**Access Methods**:
+- **Local Machine**: `http://localhost:8001`
+- **Remote Server**: `http://<服务器IP>:8001`
+  - Find IP: `ifconfig | grep "inet "` or `ip addr show`
+  - Example: If IP is `192.168.1.100`, access `http://192.168.1.100:8001`
+- **With Domain**: Configure reverse proxy to point to `localhost:8001`
 
 **Note**: First run will download ~7GB model, please be patient.
 

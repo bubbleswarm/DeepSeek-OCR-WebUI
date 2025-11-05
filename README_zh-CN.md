@@ -202,8 +202,23 @@ docker compose up -d
 docker logs -f deepseek-ocr-webui
 
 # 4. 访问 Web UI
-# http://localhost:8001
+# 服务监听所有网络接口 (0.0.0.0:8001)，可选择以下访问方式：
+#
+# - 本地访问: http://localhost:8001
+# - 局域网访问: http://<服务器IP>:8001
+# - 域名访问: http://<您的域名>:8001（如已配置）
+#
+# 示例：如果服务器IP是 192.168.1.100，使用：
+# http://192.168.1.100:8001
 ```
+
+**访问方式**：
+- **本地机器**: `http://localhost:8001`
+- **远程服务器（无域名）**: `http://<服务器IP地址>:8001`
+  - 查看IP: `hostname -I` 或 `ip addr show`
+  - 示例：如果IP是 `192.168.1.100`，访问 `http://192.168.1.100:8001`
+- **有域名**: `http://<您的域名>:8001` 或 `https://<您的域名>`
+  - 配置反向代理（nginx/caddy）转发到 `localhost:8001`
 
 ---
 
@@ -302,8 +317,11 @@ pip install einops addict easydict matplotlib
 # 检查容器状态（Docker）
 docker compose ps
 
-# 检查健康状态
+# 检查健康状态（本地）
 curl http://localhost:8001/health
+
+# 检查健康状态（远程 - 替换为您的IP）
+curl http://<服务器IP>:8001/health
 
 # 预期响应：
 # {
@@ -313,6 +331,23 @@ curl http://localhost:8001/health
 #   "model_loaded": true
 # }
 ```
+
+### 🌐 网络访问配置
+
+服务配置为监听**所有网络接口**（`0.0.0.0:8001`），可从以下方式访问：
+
+1. **本地机器**: `http://localhost:8001`
+2. **局域网**: `http://<本地IP>:8001`
+3. **远程服务器（无域名）**: `http://<公网IP>:8001`
+   - 确保防火墙允许端口 8001: `sudo ufw allow 8001`
+4. **有域名/反向代理**: 
+   - 配置 nginx/caddy 转发到 `localhost:8001`
+   - 示例: `https://your-domain.com` → `http://localhost:8001`
+
+**安全提示**：对于公网IP访问的生产环境，建议：
+- 使用反向代理（nginx/caddy）并配置 SSL/TLS
+- 使用防火墙规则限制访问
+- 如需要，添加身份验证
 
 ---
 

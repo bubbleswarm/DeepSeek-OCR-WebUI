@@ -65,7 +65,6 @@ def load_model_from_source(source_name: str, model_path: str, timeout: int = 300
     if source_name == 'modelscope':
         try:
             from modelscope import snapshot_download
-            import os
             
             # 使用 ModelScope 下载模型到本地缓存
             print(f"📥 正在从 ModelScope 下载模型...")
@@ -622,9 +621,13 @@ if __name__ == "__main__":
     print("\n" + "="*50)
     print("🚀 DeepSeek-OCR 增强版 Web 服务")
     print("="*50)
-    print(f"📍 访问地址: http://0.0.0.0:{port}")
-    print(f"📚 API 文档: http://0.0.0.0:{port}/docs")
-    print(f"❤️ 健康检查: http://0.0.0.0:{port}/health")
+    print(f"📍 服务已启动，监听地址: 0.0.0.0:{port}")
+    print(f"📚 API 文档: http://localhost:{port}/docs")
+    print(f"❤️ 健康检查: http://localhost:{port}/health")
+    print("\n💡 访问方式:")
+    print("   - 本地访问: http://localhost:8001")
+    print("   - 局域网访问: http://<服务器IP>:8001")
+    print("   - 域名访问: http://<您的域名>:8001")
     print("="*50 + "\n")
     
     uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
