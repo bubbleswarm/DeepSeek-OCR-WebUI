@@ -15,10 +15,6 @@ services:
               count: 1
               capabilities: [gpu]
     
-    # 端口映射 - 开放所有 IP 访问
-    ports:
-      - "0.0.0.0:8001:8001"
-    
     # 环境变量
     environment:
       - CUDA_VISIBLE_DEVICES=0
@@ -29,9 +25,6 @@ services:
     volumes:
       - ./models:/root/.cache/huggingface
       - ./logs:/app/logs
-    
-    # 共享内存大小（vLLM 需要）
-    shm_size: "16g"
     
     # 重启策略
     restart: unless-stopped
