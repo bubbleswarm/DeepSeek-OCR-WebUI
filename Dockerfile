@@ -39,7 +39,11 @@ RUN pip install \
 
 # 复制应用代码
 COPY web_service.py .
+COPY web_service_gpu.py .
+COPY gpu_manager.py .
 COPY ocr_ui_modern.html .
+COPY backends ./backends
+COPY i18n.js .
 
 # 暴露端口
 EXPOSE 8001
@@ -48,5 +52,5 @@ EXPOSE 8001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5m --retries=3 \
     CMD curl -f http://localhost:8001/health || exit 1
 
-# 启动服务
-CMD ["python", "web_service.py", "8001"]
+# 启动服务 (使用 GPU 管理版本 - 懒加载 + 即用即卸)
+CMD ["python", "web_service_gpu.py", "8001"]

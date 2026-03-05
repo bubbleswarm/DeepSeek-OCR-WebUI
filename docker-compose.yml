@@ -1,12 +1,12 @@
+version: '3.8'
+
 services:
-  deepseek-ocr-webui:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  deepseek-ocr:
+    image: neosun/deepseek-ocr:latest
     container_name: deepseek-ocr-webui
-    image: deepseek-ocr-webui:latest
-    
-    # GPU 配置
+    ports:
+      - "8001:8001"
+    shm_size: 8g
     deploy:
       resources:
         reservations:
@@ -24,11 +24,10 @@ services:
       - CUDA_VISIBLE_DEVICES=0
       - VLLM_USE_V1=0
       - PYTHONUNBUFFERED=1
-      - DEEPSEEK_OCR_MODEL_PATH=/app/models/deepseek-ocr
     
     # 挂载卷（用于模型缓存）
     volumes:
-      - ./models:/app/models
+      - ./models:/root/.cache/huggingface
       - ./logs:/app/logs
     
     # 共享内存大小（vLLM 需要）
@@ -36,23 +35,9 @@ services:
     
     # 重启策略
     restart: unless-stopped
-    
-    # 健康检查
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 5m
-    
-    # 资源限制
-    mem_limit: 32g
-    memswap_limit: 32g
-    
-    # 网络模式
-    networks:
-      - ocr-network
-
-networks:
-  ocr-network:
-    driver: bridge

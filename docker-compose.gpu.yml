@@ -1,0 +1,42 @@
+services:
+  deepseek-ocr-gpu:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    container_name: deepseek-ocr-gpu
+    image: deepseek-ocr-gpu:latest
+    
+    runtime: nvidia
+    
+    ports:
+      - "0.0.0.0:8001:8001"
+    
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-0}
+      - CUDA_VISIBLE_DEVICES=0
+      - GPU_IDLE_TIMEOUT=${GPU_IDLE_TIMEOUT:-60}
+      - PYTHONUNBUFFERED=1
+    
+    volumes:
+      - ./models:/root/.cache/huggingface
+      - ./logs:/app/logs
+    
+    shm_size: "8g"
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5m
+    
+    mem_limit: 32g
+    memswap_limit: 32g
+    
+    networks:
+      - ocr-network
+
+networks:
+  ocr-network:
+    driver: bridge
