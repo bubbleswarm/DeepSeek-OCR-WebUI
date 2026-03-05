@@ -24,14 +24,15 @@ services:
       - CUDA_VISIBLE_DEVICES=0
       - VLLM_USE_V1=0
       - PYTHONUNBUFFERED=1
+      - DEEPSEEK_OCR_MODEL_PATH=/app/models/deepseek-ocr
     
     # 挂载卷（用于模型缓存）
     volumes:
-      - ./models:/root/.cache/huggingface
+      - ./models:/app/models
       - ./logs:/app/logs
     
     # 共享内存大小（vLLM 需要）
-    shm_size: "8g"
+    shm_size: "16g"
     
     # 重启策略
     restart: unless-stopped

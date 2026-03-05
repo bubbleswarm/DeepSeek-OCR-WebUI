@@ -27,13 +27,15 @@ import fitz  # PyMuPDF
 # 全局变量
 model = None
 tokenizer = None
-MODEL_PATH = 'deepseek-ai/DeepSeek-OCR'
+
+# 获取模型路径（优先使用环境变量指定的本地路径）
+MODEL_PATH = os.environ.get('DEEPSEEK_OCR_MODEL_PATH', 'deepseek-ai/DeepSeek-OCR')
 MODEL_SOURCE = None  # 记录实际使用的模型源
 
 # 模型源配置
 MODEL_SOURCES = {
-    'huggingface': 'deepseek-ai/DeepSeek-OCR',
-    'modelscope': 'deepseek-ai/DeepSeek-OCR'
+    'huggingface': MODEL_PATH,
+    'modelscope': MODEL_PATH
 }
 
 # 自定义超时异常
@@ -61,6 +63,32 @@ def load_model_from_source(source_name: str, model_path: str, timeout: int = 300
     from requests.exceptions import Timeout as RequestsTimeout, ConnectionError as RequestsConnectionError
     
     print(f"📦 尝试从 {source_name.upper()} 加载模型: {model_path}")
+    
+    # 检查是否为本地路径
+    if os.path.exists(model_path):
+        print(f"📂 从本地路径加载模型: {model_path}")
+        try:
+            # 从本地路径加载
+            tokenizer = AutoTokenizer.from_pretrained(
+                model_path,
+                trust_remote_code=True,
+            )
+            
+            model = AutoModel.from_pretrained(
+                model_path,
+                trust_remote_code=True,
+                use_safetensors=True,
+                attn_implementation="eager",
+                torch_dtype=torch.bfloat16,
+            ).eval().to("cuda")
+            
+            print(f"✅ 本地模型加载成功")
+            return model, tokenizer
+        except Exception as e:
+            print(f"❌ 本地模型加载失败: {e}")
+            import traceback
+            print(f"   错误详情: {traceback.format_exc()}")
+            raise
     
     if source_name == 'modelscope':
         try:
